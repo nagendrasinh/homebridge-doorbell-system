@@ -1,7 +1,9 @@
-# homebridge-video-doorbell-rpi
-Raspberry Pi video doorbell plugin for homebridge.
+# homebridge-doorbell-system
+Raspberry Pi video doorbell plugin for homebridge with integrated door lock mechanism service 
+using a connected gpio relay to control the lock
 
-This plugin is based on [homebridge-camera-rpi](https://github.com/moritzmhmk/homebridge-camera-rpi) by moritzmhmk
+This plugin is based on [homebridge-video-doorbell-rpi](https://github.com/Supereg/homebridge-video-doorbell-rpi) which 
+again is based on [homebridge-camera-rpi](https://github.com/moritzmhmk/homebridge-camera-rpi) by moritzmhmk,
 licensed under MIT license.
 
 ## Prerequisite
@@ -10,11 +12,14 @@ licensed under MIT license.
 * module `bcm2835-v4l2` loaded (add `bcm2835-v4l2` to `/etc/modules` and reboot)
 * ffmpeg installed (`sudo apt install ffmpeg` _you probably need to compile ffmpeg by yourself if it isn't available
  in the package manager_)
+* **Premissions**:
+  * user running homebridge/standalone plugin must be part of the `video` group to access the raspberry pi camera
+  * user running homebridge/standalone plugin must be part of the `gpio` group to control the gpio output
 
 ## Installation (as homebridge plugin)
 
 ```bash
-npm install -g homebridge-video-doorbell-rpi
+npm install -g homebridge-doorbell-system
 ```
 
 edit ``config.json`` and add platform ``rpi-doorbell``
@@ -26,7 +31,7 @@ edit ``config.json`` and add platform ``rpi-doorbell``
     ...
     {
       "platform": "rpi-doorbell",
-      "doorbells": [
+      "devices": [
         {
           "name": "Pi Video Doorbell",
         }
@@ -46,15 +51,15 @@ optionally install in `opt`:
 
 ```bash
 cd /opt
-sudo mkdir homebridge-video-doorbell-rpi
-sudo chown pi homebridge-video-doorbell-rpi
+sudo mkdir homebridge-doorbell-system
+sudo chown pi homebridge-doorbell-system
 ```
 
 install:
 
 ```bash
-git clone https://github.com/Supereg/homebridge-video-doorbell-rpi
-cd homebridge-video-doorbell-rpi
+git clone https://github.com/Supereg/homebridge-doorbell-system
+cd homebridge-doorbell-system
 npm install
 ```
 
@@ -68,11 +73,11 @@ node standalone.js
  
  ```ini
 [Unit]
-Description=HAP Video Doorbell RPi
+Description=HAP Doorbell RPi
 
 [Service]
-ExecStart=/usr/local/bin/node /opt/homebridge-video-doorbell-rpi/standalone.js -c /etc/homebridge-video-doorbell-rpi.conf.json
-WorkingDirectory=/opt/homebridge-video-doorbell-rpi
+ExecStart=/usr/local/bin/node /opt/homebridge-doorbell-system/standalone.js -c /etc/homebridge-doorbell-system.conf.json
+WorkingDirectory=/opt/homebridge-doorbell-system
 Restart=always
 RestartSec=10
 User=pi
@@ -81,12 +86,12 @@ User=pi
 WantedBy=multi-user.target
  ```
  
- create config file `/etc/homebridge-video-doorbell-rpi.conf.json`:
+ create config file `/etc/homebridge-doorbell-system.conf.json`:
 
 ```json
 {
-  "name": "Pi Video Doorbell",
-  "id": "Pi Video Doorbell",
+  "name": "Pi Doorbell",
+  "id": "Pi Doorbell",
   "pincode": "031-45-154",
   "username": "EC:23:3D:D3:CE:CE"
 }
@@ -104,8 +109,8 @@ sudo systemctl start hap-doorbell-rpi
 ## Options
 ```json
 {
-  "name": "Pi Video Doorbell",
-  "id": "Pi Video Doorbell",
+  "name": "Pi Doorbell",
+  "id": "Pi Doorbell",
   "rotate": 0,
   "verticalFlip": false,
   "horizontalFlip": false,

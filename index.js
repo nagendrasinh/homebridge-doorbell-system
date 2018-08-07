@@ -23,10 +23,10 @@ function Platform (log, config, api) {
 Platform.prototype.configureAccessory = function (accessory) {};
 
 Platform.prototype.didFinishLaunching = function () {
-    if (!this.config.doorbells)
+    if (!this.config.devices)
         return;
 
-    const configuredAccessories = this.config.doorbells.map(conf => new this.CameraAccessory(conf));
+    const configuredAccessories = this.config.devices.map(conf => new this.CameraAccessory(conf));
 
     this.api.publishCameraAccessories('rpi-doorbell', configuredAccessories);
 };

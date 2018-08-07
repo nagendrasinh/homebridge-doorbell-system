@@ -1,18 +1,18 @@
 {
-  "name": "homebridge-video-doorbell-rpi",
-  "version": "1.0.1",
-  "description": "Homebridge doorbell plugin using the raspberry pi camera",
+  "name": "homebridge-doorbell-system",
+  "version": "2.0.0",
+  "description": "Homebridge Plugin containing video doorbell and gpio based door lock mechanism",
   "main": "index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Supereg/homebridge-video-doorbell-rpi"
+    "url": "https://github.com/Supereg/homebridge-doorbell-system.git"
   },
   "keywords": [
     "homebridge-plugin"
   ],
   "bugs": {
-    "url": "https://github.com/Supereg/homebridge-video-doorbell-rpi/issues"
+    "url": "https://github.com/Supereg/homebridge-doorbell-system.git/issues"
   },
   "engines": {
     "node": ">=5.0.0",
