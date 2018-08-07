@@ -16,13 +16,13 @@
   },
   "engines": {
     "node": ">=5.0.0",
-    "homebridge": ">=0.4.5"
+    "homebridge": ">=0.4.46"
   },
   "dependencies": {
     "ip": "^1.1.5"
   },
   "devDependencies": {
-    "hap-nodejs": "^0.4.32",
+    "hap-nodejs": "0.4.47",
     "minimist": "^1.2.0"
   }
 }

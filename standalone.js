@@ -1,7 +1,7 @@
 'use strict'
 const minimist = require('minimist')
 const hap = require('hap-nodejs')
-const CameraAccessory = require('./CameraAccessory')(hap, hap.Accessory, console.log)
+const DoorbellAccessory = require('./DoorbellAccessory')(hap, hap.Accessory, console.log)
 
 let conf = {}
 const argv = minimist(process.argv.slice(2))
@@ -16,17 +16,17 @@ console.log('HAP-NodeJS starting...')
 
 hap.init()
 
-const cameraAccessory = new CameraAccessory(conf)
+const doorbellAccessory = new DoorbellAccessory(conf)
 
 const pincode = conf.pincode || '031-45-154'
 
-cameraAccessory.publish({
+doorbellAccessory.publish({
   username: conf.username || 'EC:23:3D:D3:CE:CE',
   pincode: pincode,
-  category: hap.Accessory.Categories.CAMERA
+  category: hap.Accessory.Categories.VIDEO_DOORBELL
 }, true)
 
-console.log('Scan this code with your HomeKit App on your iOS device to pair with Camera:')
+console.log('Scan this code with your HomeKit App on your iOS device to pair with Doorbell:')
 console.log('                       ')
 console.log('    ┌────────────┐     ')
 console.log(`    │ ${pincode} │     `)
