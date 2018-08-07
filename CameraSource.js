@@ -6,9 +6,13 @@ const crypto = require('crypto');
 
 module.exports = Camera;
 
-function Camera (hap, conf) {
+function Camera(hap, conf, log) {
     this.hap = hap;
     this.conf = conf;
+    this.log = log;
+
+    this.debug = conf.debug || false;
+
     this.services = [];
     this.streamControllers = [];
 
@@ -63,20 +67,32 @@ Camera.prototype.handleSnapshotRequest = function (request, callback) {
     const ffmpegCommand = `\
 -f video4linux2 -input_format mjpeg -video_size ${request.width}x${request.height} -i /dev/video0 \
 -vframes 1 -f mjpeg -`;
-    console.log(ffmpegCommand);
+
+    if (this.debug)
+        this.log("ffmpeg " + ffmpegCommand);
 
     const ffmpeg = spawn('ffmpeg', ffmpegCommand.split(' '), {env: process.env});
     let imageBuffer = Buffer.alloc(0);
 
     ffmpeg.stdout.on('data', function (data) {
         imageBuffer = Buffer.concat([imageBuffer, data])
-    });
-    ffmpeg.stderr.on('data', function (data) {
-        console.log('ffmpeg', String(data))
-    });
+    }.bind(this));
+    if (this.debug) {
+        ffmpeg.stderr.on('data', function (data) {
+            this.log("ffmpeg " + String(data));
+        }.bind(this));
+    }
+    ffmpeg.on('error', function (error) {
+        this.log("Failed to take a snapshot: " + error.message);
+    }.bind(this));
     ffmpeg.on('close', function (code) {
-        callback(null, imageBuffer)
-    });
+        if (!code ||code === 255) {
+            this.log(`Took snapshot at ${request.width}x${request.height}`);
+            callback(null, imageBuffer);
+        }
+        else
+            this.log(`ffmpeg snapshot exited with code ${code}`)
+    }.bind(this));
 };
 
 Camera.prototype.handleCloseConnection = function (connectionID) {
@@ -182,17 +198,32 @@ Camera.prototype.handleStreamRequest = function (request) {
         const port = this.pendingSessions[sessionIdentifier]['video_port'];
         const ssrc = this.pendingSessions[sessionIdentifier]['video_ssrc'];
 
+        this.log(`Starting video stream (${width}x${height}, ${fps} fps, ${bitrate} kbps)`)
+
         const ffmpegCommand = `\
 -f video4linux2 -input_format h264 -video_size ${width}x${height} -framerate ${fps} -i /dev/video0 \
 -vcodec copy -an -payload_type 99 -ssrc ${ssrc} -f rtp \
 -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${srtp} \
 srtp://${address}:${port}?rtcpport=${port}&localrtcpport=${port}&pkt_size=1378`;
-        console.log(ffmpegCommand);
+        if (this.debug)
+            this.log("ffmpeg " + ffmpegCommand);
 
         const ffmpeg = spawn('ffmpeg', ffmpegCommand.split(' '), {env: process.env});
-        ffmpeg.stderr.on('data', function (data) {
-            console.log('ffmpeg', String(data))
-        });
+
+        if (this.debug) {
+            ffmpeg.stderr.on('data', function (data) {
+                this.log("ffmpeg " + String(data));
+            }.bind(this));
+        }
+        ffmpeg.on('error', function (error) {
+            this.log("Failed to start video stream: " + error.message);
+        }.bind(this));
+        ffmpeg.on('close', function (code) {
+            if (!code || code === 255)
+                this.log("Video stream stopped");
+            else
+                this.log(`ffmpeg video stream exited with code ${code}`)
+        }.bind(this));
 
         this.ongoingSessions[sessionIdentifier] = ffmpeg;
 
@@ -226,14 +257,17 @@ Camera.prototype._createStreamControllers = function (maxStreams, options) {
 
 Camera.prototype._v4l2CTLSetCTRL = function (name, value) {
     const v4l2ctlCommand = `--set-ctrl ${name}=${value}`;
-    console.log(v4l2ctlCommand);
+    if (this.debug)
+        this.log("v4l2-ctl " + v4l2ctlCommand);
 
     const v4l2ctl = spawn('v4l2-ctl', v4l2ctlCommand.split(' '), {env: process.env});
 
-    v4l2ctl.on('error', function (err) {
-        console.log(`error while setting ${name}: ${err.message}`)
-    });
-    v4l2ctl.stderr.on('data', function (data) {
-        console.log('v4l2-ctl', String(data))
-    });
+    v4l2ctl.on('error', function (error) {
+        this.log(`Failed setting ${name} to ${value}: ${error.message}`)
+    }.bind(this));
+    if (this.debug) {
+        v4l2ctl.stderr.on('data', function (data) {
+            this.log('v4l2-ctl ' + String(data))
+        }.bind(this));
+    }
 };

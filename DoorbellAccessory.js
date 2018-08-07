@@ -33,7 +33,7 @@ module.exports = (hap, Accessory, log) => class DoorbellAccessory extends Access
             callback();
         }.bind(this));
 
-        const cameraSource = new CameraSource(hap, conf);
+        const cameraSource = new CameraSource(hap, conf, log);
         this.configureCameraSource(cameraSource);
 
         this.addService(this.doorbellService);

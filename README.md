@@ -108,7 +108,8 @@ sudo systemctl start hap-doorbell-rpi
   "id": "Pi Video Doorbell",
   "rotate": 0,
   "verticalFlip": false,
-  "horizontalFlip": false
+  "horizontalFlip": false,
+  "debug": false
 }
 ```
 
