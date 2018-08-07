@@ -25,7 +25,7 @@ module.exports = (hap, Accessory, log) => class DoorbellAccessory extends Access
 
         this.doorbellService = new hap.Service.Doorbell(name);
         this.doorbellService.getCharacteristic(hap.Characteristic.ProgrammableSwitchEvent)
-            .on("get", this.getBellStatus.bind(this));
+            .on("get", DoorbellAccessory.getBellStatus.bind(this));
 
         this.on('identify', function (paired, callback) {
             log('**identify**');
@@ -62,7 +62,7 @@ module.exports = (hap, Accessory, log) => class DoorbellAccessory extends Access
         }
     }
 
-    getBellStatus(callback) {
+    static getBellStatus(callback) {
         callback(null, null);
     };
 
