@@ -1,6 +1,6 @@
 {
   "name": "homebridge-video-doorbell-rpi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Homebridge doorbell plugin using the raspberry pi camera",
   "main": "index.js",
   "license": "MIT",
