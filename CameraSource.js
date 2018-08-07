@@ -248,7 +248,7 @@ Camera.prototype.createCameraControlService = function () {
 
 Camera.prototype._createStreamControllers = function (maxStreams, options) {
     for (let i = 0; i < maxStreams; i++) {
-        const streamController = new this.hap.StreamController(i, options, self);
+        const streamController = new this.hap.StreamController(i, options, this);
 
         this.services.push(streamController.service);
         this.streamControllers.push(streamController);
