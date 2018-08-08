@@ -33,7 +33,7 @@ edit ``config.json`` and add platform ``rpi-doorbell``
       "platform": "rpi-doorbell",
       "devices": [
         {
-          "name": "Pi Video Doorbell",
+          "name": "Pi Doorbell",
         }
       ]
     }
@@ -114,6 +114,14 @@ sudo systemctl start hap-doorbell-rpi
   "rotate": 0,
   "verticalFlip": false,
   "horizontalFlip": false,
+  
+  "lock": {
+    "name": "Lock",
+    "pin": 0,
+    "unlockTime": 5000
+  },
+  
+  "triggerButton": false,
   "debug": false
 }
 ```

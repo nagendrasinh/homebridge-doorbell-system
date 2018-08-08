@@ -10,7 +10,7 @@ module.exports = function (homebridge) {
 };
 
 function Platform (log, config, api) {
-    this.CameraAccessory = require('./DoorbellAccessory')(hap, Accessory, log);
+    this.CameraAccessory = require('./DoorbellAccessory')(hap, Accessory, log, api);
     this.config = config || {};
     this.api = api;
 
