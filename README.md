@@ -22,7 +22,7 @@ licensed under MIT license.
 npm install -g homebridge-doorbell-system
 ```
 
-edit ``config.json`` and add platform ``rpi-doorbell``
+edit ``config.json`` and add platform ``rpi-doorbell-system``
 
 ```json
 {
@@ -30,7 +30,7 @@ edit ``config.json`` and add platform ``rpi-doorbell``
   "platforms": [
     ...
     {
-      "platform": "rpi-doorbell",
+      "platform": "rpi-doorbell-system",
       "devices": [
         {
           "name": "Pi Doorbell",
@@ -117,9 +117,15 @@ sudo systemctl start hap-doorbell-rpi
   
   "lock": {
     "name": "Lock",
-    "pin": 0,
+    "pin": 12,
     "unlockTime": 5000
   },
+  
+  "ringButton": [
+    {
+      "gpioPin": 14
+    }
+  ],
   
   "triggerButton": false,
   "debug": false

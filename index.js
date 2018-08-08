@@ -6,7 +6,7 @@ module.exports = function (homebridge) {
     Accessory = homebridge.platformAccessory;
     hap = homebridge.hap;
 
-    homebridge.registerPlatform('homebridge-video-doorbell-rpi', 'rpi-doorbell', Platform, true);
+    homebridge.registerPlatform('homebridge-video-doorbell-rpi', 'rpi-doorbell-system', Platform, true);
 };
 
 function Platform (log, config, api) {
@@ -28,5 +28,5 @@ Platform.prototype.didFinishLaunching = function () {
 
     const configuredAccessories = this.config.devices.map(conf => new this.CameraAccessory(conf));
 
-    this.api.publishCameraAccessories('rpi-doorbell', configuredAccessories);
+    this.api.publishCameraAccessories('rpi-doorbell-system', configuredAccessories);
 };
