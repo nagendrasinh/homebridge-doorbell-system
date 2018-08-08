@@ -93,6 +93,8 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             api.on('shutdown', () => {
                 rpio.close(this.lockPin);
             });
+
+            this.addService(this.lockService);
         }
 
         if (config.ringButton) {
