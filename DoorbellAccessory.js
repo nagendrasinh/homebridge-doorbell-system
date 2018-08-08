@@ -27,6 +27,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
         const uuid = hap.uuid.generate('homebridge-video-doorbell-rpi:' + id);
 
         super(name, uuid, hap.Accessory.Categories.VIDEO_DOORBELL); // hap.Accessory.Categories.CAMERA only required for homebridge - ignored by hap-nodejs (standalone)
+        this.log = log;
 
         this.informationService = this.getService(hap.Service.AccessoryInformation);
         this.informationService
