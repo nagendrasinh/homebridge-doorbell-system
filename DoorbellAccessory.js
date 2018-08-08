@@ -4,15 +4,19 @@ const packageJSON = require('./package.json');
 const CameraSource = require('./CameraSource');
 const rpio = require("rpio");
 
-module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends Accessory {
+/*
+ * Lock states
+ */
+const LockState = Object.freeze(
+    {
+        UNSECURED: 0,
+        SECURED: 1,
+        JAMMED: 2,
+        UNKNOWN: 3
+    }
+);
 
-    /*
-     * Lock states
-     */
-    UNSECURED = 0;
-    SECURED = 1;
-    JAMMED = 2;
-    UNKNOWN = 3;
+module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends Accessory {
 
     constructor (config) {
         config = config || {};
@@ -89,6 +93,37 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
                 rpio.close(this.lockPin);
             });
         }
+
+        if (config.ringButton) {
+            config.ringButton.map(configuration => {
+                const gpioPin = configuration.gpioPin;
+                const debounce = 200; // TODO maybe configurable?
+
+                rpio.open(gpioPin, rpio.INPUT, rpio.PULL_UP);
+
+                let previous = rpio.HIGH;
+                let current;
+                let time = 0;
+
+                let interval = setInterval(() => {
+                    current = rpio.read(gpioPin);
+
+                    const milliseconds = new Date().getTime();
+                    if (current === rpio.LOW && previous === rpio.HIGH && milliseconds - time > debounce) {
+                        this.ringTheBell();
+
+                        time = milliseconds;
+                    }
+
+                    previous = current;
+                }, 100);
+
+                api.on('shutdown', () => {
+                    clearInterval(interval);
+                    rpio.close(gpioPin);
+                })
+            });
+        }
     }
 
     static getBellStatus(callback) {
@@ -106,27 +141,27 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
         }
 
         switch (state) {
-            case this.UNSECURED:
-                this.setLockState0(this.UNSECURED);
+            case LockState.UNSECURED:
+                this.setLockState0(LockState.UNSECURED);
 
                 this.timer = setTimeout(() => {
-                    this.setLockState0(this.SECURED, () => {
+                    this.setLockState0(LockState.SECURED, () => {
                         this.lockService.setCharacteristic(hap.Characteristic.LockTargetState, this.lockState);
                     });
 
                     this.timer = null;
                 }, this.unlockTime);
                 break;
-            case this.SECURED:
+            case LockState.SECURED:
                 if (this.timer) {
                     clearTimeout(this.timer);
 
-                    this.setLockState0(this.SECURED);
+                    this.setLockState0(LockState.SECURED);
                     this.timer = null;
                 }
                 break;
-            case this.JAMMED:
-            case this.UNKNOWN:
+            case LockState.JAMMED:
+            case LockState.UNKNOWN:
                 break;
         }
 
@@ -135,7 +170,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
     setLockState0(state, injectUpdate) {
         this.lockState = state;
-        rpio.write(this.lockPin, state === this.UNSECURED? rpio.LOW: rpio.HIGH);
+        rpio.write(this.lockPin, state === LockState.UNSECURED? rpio.LOW: rpio.HIGH);
 
         if (injectUpdate)
             injectUpdate();
