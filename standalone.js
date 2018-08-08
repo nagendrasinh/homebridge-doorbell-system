@@ -2,7 +2,12 @@
 
 const minimist = require('minimist');
 const hap = require('hap-nodejs');
-const DoorbellAccessory = require('./DoorbellAccessory')(hap, hap.Accessory, console.log);
+const EventEmitter = require('events');
+
+class FakeAPI extends EventEmitter {}
+const api = new FakeAPI();
+
+const DoorbellAccessory = require('./DoorbellAccessory')(hap, hap.Accessory, console.log, api);
 
 let conf = {};
 const argv = minimist(process.argv.slice(2));
@@ -24,6 +29,20 @@ hap.init();
 const doorbellAccessory = new DoorbellAccessory(conf);
 
 const pincode = conf.pincode || '031-45-154';
+
+const signals = { 'SIGINT': 2, 'SIGTERM': 15 };
+Object.keys(signals).forEach(signal => {
+   process.on(signal, () => {
+       console.log("Got %s, shutting down Doorbell System...", signal);
+
+       api.emit('shutdown');
+       doorbellAccessory.unpublish();
+
+       setTimeout(() => {
+          process.exit(128 + signals[signal]);
+       });
+   });
+});
 
 doorbellAccessory.publish({
     username: conf.username || 'EC:23:3D:D3:CE:CE',
