@@ -131,6 +131,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
     }
 
     ringTheBell() {
+        this.log("Ding Dong!");
         this.doorbellService.setCharacteristic(hap.Characteristic.ProgrammableSwitchEvent, 0);
     }
 
