@@ -88,7 +88,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
                 .on("get", this.getLockState.bind(this))
                 .on("set", this.setLockState.bind(this));
 
-            rpio.open(this.lockPin, rpio.OUTPUT, rpio.HIGH);
+            rpio.open(this.lockPin, rpio.OUTPUT, rpio.LOW);
 
             api.on('shutdown', () => {
                 rpio.close(this.lockPin);
@@ -174,7 +174,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
     setLockState0(state, injectUpdate) {
         this.lockState = state;
-        rpio.write(this.lockPin, state === LockState.UNSECURED? rpio.LOW: rpio.HIGH);
+        rpio.write(this.lockPin, state === LockState.UNSECURED? rpio.HIGH: rpio.LOW);
 
         if (injectUpdate)
             injectUpdate();
