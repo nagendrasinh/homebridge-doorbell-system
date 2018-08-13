@@ -232,6 +232,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             this.switchState = false;
             rpio.write(this.switchPin, rpio.LOW);
         }
+        callback();
     }
 
     getSwitchState(callback) {
