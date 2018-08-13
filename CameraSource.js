@@ -65,8 +65,8 @@ function Camera(hap, conf, log) {
 
 Camera.prototype.handleSnapshotRequest = function (request, callback) {
     const ffmpegCommand = `\
--f video4linux2 -input_format mjpeg -video_size ${request.width}x${request.height} -i /dev/video0 \
--vframes 1 -f mjpeg -`;
+-f v4l2 -i /dev/video1 \
+-vcodec mjpeg -s ${request.width}x${request.height} -vframes 1 -f mjpeg -`;
 
     if (this.debug)
         this.log("ffmpeg " + ffmpegCommand);
@@ -201,9 +201,10 @@ Camera.prototype.handleStreamRequest = function (request) {
         this.log(`Starting video stream (${width}x${height}, ${fps} fps, ${bitrate} kbps)`)
 
         const ffmpegCommand = `\
--f video4linux2 -input_format h264 -video_size ${width}x${height} -framerate ${fps} -i /dev/video0 \
--vcodec copy -an -payload_type 99 -ssrc ${ssrc} -f rtp \
--srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${srtp} \
+-f v4l2 -i /dev/video1 \
+-c:v h264_omx -s ${width}x${height} -r ${fps} \
+-an -payload_type 99 -ssrc ${ssrc} -f rtp \\
+-srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${srtp} \\
 srtp://${address}:${port}?rtcpport=${port}&localrtcpport=${port}&pkt_size=1378`;
         if (this.debug)
             this.log("ffmpeg " + ffmpegCommand);
