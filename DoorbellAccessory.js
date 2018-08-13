@@ -104,7 +104,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             this.switchPin = config.lightSwitch.pin;
             this.switchTime = config.lightSwitch.switchTime || 500;
 
-            this.switchService = new hap.Service.Switch(this.switchName);
+            this.switchService = new hap.Service.Lightbulb(this.switchName);
             this.switchService.getCharacteristic(hap.Characteristic.On)
                 .on("get", this.getSwitchState.bind(this))
                 .on("set", this.setSwitchState.bind(this));
