@@ -203,8 +203,8 @@ Camera.prototype.handleStreamRequest = function (request) {
         const ffmpegCommand = `\
 -f v4l2 -i /dev/video1 \
 -c:v h264_omx -s ${width}x${height} -r ${fps} \
--an -payload_type 99 -ssrc ${ssrc} -f rtp \\
--srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${srtp} \\
+-an -payload_type 99 -ssrc ${ssrc} -f rtp \
+-srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params ${srtp} \
 srtp://${address}:${port}?rtcpport=${port}&localrtcpport=${port}&pkt_size=1378`;
         if (this.debug)
             this.log("ffmpeg " + ffmpegCommand);
