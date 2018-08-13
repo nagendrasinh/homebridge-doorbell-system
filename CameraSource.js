@@ -90,8 +90,10 @@ Camera.prototype.handleSnapshotRequest = function (request, callback) {
             this.log(`Took snapshot at ${request.width}x${request.height}`);
             callback(null, imageBuffer);
         }
-        else
-            this.log(`ffmpeg snapshot exited with code ${code}`)
+        else {
+            this.log(`ffmpeg snapshot exited with code ${code}`);
+            callback(new Error(`ffmpeg snapshot exited with code ${code}`));
+        }
     }.bind(this));
 };
 
