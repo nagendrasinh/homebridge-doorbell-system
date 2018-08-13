@@ -210,11 +210,12 @@ srtp://${address}:${port}?rtcpport=${port}&localrtcpport=${port}&pkt_size=1378`;
 
         const ffmpeg = spawn('ffmpeg', ffmpegCommand.split(' '), {env: process.env});
 
-        if (this.debug) {
-            ffmpeg.stderr.on('data', function (data) {
+        // Always setup hook on stderr.
+        // Without this streaming stops within one to two minutes.
+        ffmpeg.stderr.on('data', data => {
+            if (this.debug)
                 this.log("ffmpeg " + String(data));
-            }.bind(this));
-        }
+        });
         ffmpeg.on('error', function (error) {
             this.log("Failed to start video stream: " + error.message);
         }.bind(this));
