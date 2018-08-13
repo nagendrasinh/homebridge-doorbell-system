@@ -222,8 +222,16 @@ srtp://${address}:${port}?rtcpport=${port}&localrtcpport=${port}&pkt_size=1378`;
         ffmpeg.on('close', function (code) {
             if (!code || code === 255)
                 this.log("Video stream stopped");
-            else
+            else {
                 this.log(`ffmpeg video stream exited with code ${code}`)
+
+                for (let i = 0; i < this.streamControllers.length; i++) {
+                    const controller = this.streamControllers[i];
+                    if (controller.sessionIdentifier === sessionID) {
+                        controller.forceStop();
+                    }
+                }
+            }
         }.bind(this));
 
         this.ongoingSessions[sessionIdentifier] = ffmpeg;
