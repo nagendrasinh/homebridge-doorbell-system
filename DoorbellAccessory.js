@@ -97,6 +97,27 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             this.addService(this.lockService);
         }
 
+        if (config.lightSwitch && config.lightSwitch.pin) {
+            this.switchState = false;
+
+            this.switchName = config.lightSwitch.name || "Light";
+            this.switchPin = config.lightSwitch.pin;
+            this.switchTime = config.lightSwitch.switchTime || 500;
+
+            this.switchService = new hap.Service.Switch(this.switchName);
+            this.switchService.getCharacteristic(hap.Characteristic.On)
+                .on("get", this.getSwitchState.bind(this))
+                .on("set", this.setSwitchState.bind(this));
+
+            rpio.open(this.switchPin, rpio.OUTPUT, rpio.LOW);
+
+            api.on('shutdown', () => {
+                rpio.close(this.switchPin);
+            });
+
+            this.addService(this.switchService);
+        }
+
         if (config.ringButton) {
             config.ringButton.map(configuration => {
                 const gpioPin = configuration.gpioPin;
@@ -148,20 +169,20 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             case LockState.UNSECURED:
                 this.setLockState0(LockState.UNSECURED);
 
-                this.timer = setTimeout(() => {
+                this.lockTimer = setTimeout(() => {
                     this.setLockState0(LockState.SECURED, () => {
                         this.lockService.setCharacteristic(hap.Characteristic.LockTargetState, this.lockState);
                     });
 
-                    this.timer = null;
+                    this.lockTimer = null;
                 }, this.unlockTime);
                 break;
             case LockState.SECURED:
-                if (this.timer) {
-                    clearTimeout(this.timer);
+                if (this.lockTimer) {
+                    clearTimeout(this.lockTimer);
 
                     this.setLockState0(LockState.SECURED);
-                    this.timer = null;
+                    this.lockTimer = null;
                 }
                 break;
             case LockState.JAMMED:
@@ -184,6 +205,37 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
     getLockState(callback) {
         callback(null, this.lockState);
+    }
+
+    setSwitchState(state, callback) {
+        if (state === this.switchState) {
+            callback();
+            return;
+        }
+
+        if (state) {
+            this.switchState = true;
+            rpio.write(this.switchPin, rpio.HIGH);
+
+            this.switchTimer = setTimeout(() => {
+                this.switchService.setCharacteristic(hap.Characteristic.On, false);
+
+                this.switchTimer = null;
+            }, this.switchTime);
+        }
+        else {
+            if (this.switchTimer) {
+                clearTimeout(this.switchTimer);
+                this.switchTimer = null;
+            }
+
+            this.switchState = false;
+            rpio.write(this.switchPin, rpio.LOW);
+        }
+    }
+
+    getSwitchState(callback) {
+        callback(null, this.switchState);
     }
 
 };
