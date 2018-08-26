@@ -88,7 +88,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
                 .on("get", this.getLockState.bind(this))
                 .on("set", this.setLockState.bind(this));
 
-            rpio.open(this.lockPin, rpio.OUTPUT, rpio.LOW);
+            rpio.open(this.lockPin, rpio.OUTPUT, rpio.HIGH);
 
             api.on('shutdown', () => {
                 rpio.close(this.lockPin);
@@ -109,7 +109,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
                 .on("get", this.getSwitchState.bind(this))
                 .on("set", this.setSwitchState.bind(this));
 
-            rpio.open(this.switchPin, rpio.OUTPUT, rpio.LOW);
+            rpio.open(this.switchPin, rpio.OUTPUT, rpio.HIGH);
 
             api.on('shutdown', () => {
                 rpio.close(this.switchPin);
@@ -216,7 +216,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
     setLockState0(state, injectUpdate) {
         this.lockState = state;
-        rpio.write(this.lockPin, state === LockState.UNSECURED? rpio.HIGH: rpio.LOW);
+        rpio.write(this.lockPin, state === LockState.UNSECURED? rpio.LOW: rpio.HIGH);
 
         if (injectUpdate)
             injectUpdate();
@@ -236,7 +236,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
         if (state) {
             this.switchState = true;
-            rpio.write(this.switchPin, rpio.HIGH);
+            rpio.write(this.switchPin, rpio.LOW);
 
             this.switchTimer = setTimeout(() => {
                 this.switchService.setCharacteristic(hap.Characteristic.On, false);
@@ -251,7 +251,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             }
 
             this.switchState = false;
-            rpio.write(this.switchPin, rpio.LOW);
+            rpio.write(this.switchPin, rpio.HIGH);
         }
         callback();
     }
