@@ -1,6 +1,6 @@
 {
   "name": "homebridge-doorbell-system",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Homebridge Plugin containing video doorbell and gpio based door lock mechanism",
   "main": "index.js",
   "license": "MIT",
