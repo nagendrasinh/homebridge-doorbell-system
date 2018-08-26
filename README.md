@@ -127,6 +127,10 @@ sudo systemctl start hap-doorbell-rpi
     }
   ],
   
+  "bell": {
+    "pin": 16
+  },
+  
   "triggerButton": false,
   "debug": false
 }

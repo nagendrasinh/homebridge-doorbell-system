@@ -118,6 +118,17 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             this.addService(this.switchService);
         }
 
+        if (config.bell && config.bell.pin) {
+            this.bellPin = config.bell.pin;
+            this.bellTime = config.bell.time || 500;
+
+            rpio.open(this.bellPin, rpio.OUTPUT, rpio.HIGH);
+
+            api.on('shutdown', () => {
+               rpio.close(this.bellPin);
+            });
+        }
+
         if (config.ringButton) {
             config.ringButton.map(configuration => {
                 const gpioPin = configuration.gpioPin;
@@ -159,6 +170,14 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
         api.emit('ring');
 
         this.doorbellService.setCharacteristic(hap.Characteristic.ProgrammableSwitchEvent, 0);
+
+        if (this.bellPin) {
+            rpio.write(this.bellPin, rpio.LOW);
+
+            setTimeout(() => {
+                rpio.write(this.bellPin, rpio.HIGH);
+            }, this.bellTime);
+        }
     }
 
     setLockState(state, callback) {
