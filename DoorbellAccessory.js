@@ -2,6 +2,7 @@
 
 const packageJSON = require('./package.json');
 const CameraSource = require('./CameraSource');
+const ClimateSensor = require('./ClimateSensor');
 const rpio = require("rpio");
 
 /*
@@ -158,6 +159,14 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
                     rpio.close(gpioPin);
                 })
             });
+        }
+
+        const climateSensor = new ClimateSensor(hap, config, log);
+        const climateSensorService = climateSensor.getServices();
+
+        for (let i = 0; i < climateSensorService.length; i++) {
+            const service = climateSensorService[i];
+            this.addService(service);
         }
     }
 

@@ -131,6 +131,16 @@ sudo systemctl start hap-doorbell-rpi
     "pin": 16
   },
   
+  "climateSensor": {
+    "gpioPin": 12,
+    "temperatureName": "Temperature",
+    "humidityName": "Humidity",
+    "querySeconds": 20,
+    
+    "systemTemp": false,
+    "systemTempName": "System Temperature"
+  },
+  
   "triggerButton": false,
   "debug": false
 }
