@@ -46,7 +46,7 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
             callback();
         });
 
-        const cameraSource = new CameraSource(hap, config, log);
+        const cameraSource = new CameraSource(hap, api, config, log);
         this.configureCameraSource(cameraSource);
 
         this.addService(this.doorbellService);
@@ -156,6 +156,8 @@ module.exports = (hap, Accessory, log, api) => class DoorbellAccessory extends A
 
     ringTheBell() {
         this.log("Ding Dong!");
+        api.emit('ring');
+
         this.doorbellService.setCharacteristic(hap.Characteristic.ProgrammableSwitchEvent, 0);
     }
 

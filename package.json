@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "ip": "^1.1.5",
-    "rpio": "^0.9.22"
+    "rpio": "^0.9.22",
+    "sharp": "^0.20.5"
   },
   "devDependencies": {
     "hap-nodejs": "0.4.47",
